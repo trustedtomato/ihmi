@@ -15,7 +15,6 @@ export const algorithm1: Algorithm = async (dataset, userPrompt) => {
 
   const response = await chat(
     {
-      model: 'dolphin-phi',
       messages: [
         {
           role: 'system',
@@ -31,38 +30,37 @@ export const algorithm1: Algorithm = async (dataset, userPrompt) => {
           content: userPrompt
         }
       ],
-      stream: true,
-      format: 'json'
-    },
-    (responseJson: any) => {
-      if (!responseJson?.selectedObjects) {
-        return left('Wrong. No selectedObjects field found in response')
-      }
-
-      if (!Array.isArray(responseJson.selectedObjects)) {
-        return left('Wrong. selectedObjects field is not an array')
-      }
-
-      const objects: DatasetObject[] = []
-      const nonExistentIds: number[] = []
-      for (const id of responseJson.selectedObjects) {
-        const fixedId = parseInt(id)
-        if (isNaN(fixedId)) {
-          return left(
-            'Wrong. selectedObjects field should be an array of numbers, where each number is an object ID'
-          )
+      isJson: 'object',
+      transform: (responseJson: any) => {
+        if (!responseJson?.selectedObjects) {
+          return left('Wrong. No selectedObjects field found in response')
         }
-
-        const object = dataset[id]
-        if (!object) {
-          nonExistentIds.push(id)
-          continue
+  
+        if (!Array.isArray(responseJson.selectedObjects)) {
+          return left('Wrong. selectedObjects field is not an array')
         }
-
-        objects.push(object)
+  
+        const objects: DatasetObject[] = []
+        const nonExistentIds: number[] = []
+        for (const id of responseJson.selectedObjects) {
+          const fixedId = parseInt(id)
+          if (isNaN(fixedId)) {
+            return left(
+              'Wrong. selectedObjects field should be an array of numbers, where each number is an object ID'
+            )
+          }
+  
+          const object = dataset[id]
+          if (!object) {
+            nonExistentIds.push(id)
+            continue
+          }
+  
+          objects.push(object)
+        }
+  
+        return right(objects)
       }
-
-      return right(objects)
     }
   )
 

@@ -27,7 +27,8 @@ export const algorithm2: Algorithm = async (dataset, userPrompt) => {
           content: userPrompt
         }
       ],
-      grammar: stripIndent(`root ::= [1-9] [0-9]*`)
+      isJson: 'any',
+      grammar: stripIndent(`root ::= [1-9] [0-9]* [ \t\n]+`)
     }
   )
 
@@ -44,14 +45,7 @@ export const algorithm2: Algorithm = async (dataset, userPrompt) => {
 
             ${JSON.stringify(objects)}
 
-            Reply with a comma-separated list of object IDs, e.g. "0,1,2". The list should probably contain exactly ${numberOfPickups} object IDs.
-
-            Some examples:
-            - Give me an orange and a banana: 0,1
-            - Pick up the apple: 2
-            - Pick up nothing:
-            - Something unrelated:
-            - Pick up two fruits: 0,1
+            Reply with a JSON array, containing the object IDs, with an array length of exactly ${numberOfPickups}.
           `
         },
         {
@@ -59,9 +53,9 @@ export const algorithm2: Algorithm = async (dataset, userPrompt) => {
           content: userPrompt
         }
       ],
-      grammar: stripIndent(`root ::= "" | ([0-9]+ (("," | [ \t\n]+) [0-9]+)*)`),
-      transform: (response: string) => {
-        const objIds = response.split(',').map(id => parseInt(id))
+      isJson: 'any',
+      grammar: stripIndent(`root ::= "[" ([0-9]+ (("," | [ \t\n]+) [0-9]+)*)? "]"`),
+      transform: (objIds: number[]) => {
         if (objIds.length !== new Set(objIds).size) {
           return left('Try again. Duplicate object IDs are not allowed.')
         }

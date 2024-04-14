@@ -7,5 +7,7 @@ export interface BoundingBox {
 
 export interface DatasetObject {
   label: string
+  confidence: number
+  trackingId: number
   boundingBox: BoundingBox
 }

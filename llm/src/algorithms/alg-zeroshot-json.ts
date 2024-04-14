@@ -5,9 +5,9 @@ import { left, right } from '@sweet-monads/either'
 import debug from 'debug'
 import { DatasetObject } from '../tests/datasets/DatasetObject.js'
 
-const log = debug('app:algorithm1')
+const log = debug('app:algZeroshotJson')
 
-export const algorithm1: Algorithm = async (dataset, userPrompt) => {
+export const algZeroshotJson: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     ...object

@@ -96,6 +96,8 @@ export const chat = async <T = string>(options: {
     for await (const part of response) {
       responseText += part.message.content
 
+      process.stdout.write(part.message.content)
+
       if (
         shouldStopStreaming({
           fullResponse: responseText,
@@ -110,8 +112,6 @@ export const chat = async <T = string>(options: {
         ollama.abort()
         return left('Response length exceeded')
       }
-
-      process.stdout.write(part.message.content)
     }
   } catch (err) {
   } finally {

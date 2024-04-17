@@ -42,7 +42,9 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
 
             Reply with a list of object IDs to be picked up.
             If the user prompts you for something unrelated to picking up objects,
-            you should respond with an empty list of IDs.
+            you should respond with an empty list of IDs. If the user asks for
+            something that is not in the list of objects, you should respond with
+            null.
           `
       },
       ...createExampleMessagePair('Pick up the apple.', '[0]'),
@@ -51,6 +53,8 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
       ...createExampleMessagePair('Give me some bananas.', '[1, 5]'),
       ...createExampleMessagePair('What time is it?', '[]'),
       ...createExampleMessagePair('The weather is nice.', '[]'),
+      ...createExampleMessagePair('Pick up two apples', 'null'),
+      ...createExampleMessagePair('Pick up the orange.', 'null'),
       {
         role: 'user',
         content: stripIndent`
@@ -66,10 +70,14 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
     isJson: 'any',
     maxLength: 100,
     grammar: stripIndent(
-      `root ::= "[" ([0-9]+ (("," | [ \t\n]+) [0-9]+)*)? "]"`
+      `root ::= ("[" ([0-9]+ (("," | [ \t\n]+) [0-9]+)*)? "]") | "null"`
     ),
     // grammar: stripIndent(`root ::= ([0-9]+ ("," [0-9]+)*)?[\n ]+`),
-    transform: (objIds: number[]) => {
+    transform: (objIds: number[] | null) => {
+      if (objIds === null) {
+        return right(null)
+      }
+
       if (objIds.length !== new Set(objIds).size) {
         return left('Try again. Duplicate object IDs are not allowed.')
       }

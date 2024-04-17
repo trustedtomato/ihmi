@@ -22,7 +22,10 @@ export const algZeroshot: Algorithm = async (dataset, userPrompt) => {
 
             ${JSON.stringify(objects)}
 
-            Reply with a list of object IDs to be picked up, separated by commas.
+            Reply with a JSON array of object IDs to be picked up.
+            If the user prompts you for something unrelated to picking up objects,
+            respond with []. If the user asks for something that is not
+            in the list of objects, respond with null.
           `
       },
       {

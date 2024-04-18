@@ -1,8 +1,8 @@
 import chalk from 'chalk'
-import { algorithms } from '../algorithms/index.js'
 import { ActualDatasetObject } from './datasets/ActualDatasetObject.js'
 import { datasets } from './datasets/index.js'
 import { tests } from './tests/index.js'
+import { algorithms } from './algorithms.js'
 
 const tries = 5
 

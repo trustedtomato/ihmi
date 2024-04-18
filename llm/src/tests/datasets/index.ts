@@ -1,6 +1,6 @@
 import type { DatasetObject } from './DatasetObject.js'
 
-const dataset1 = [
+const dataset1 = ([
   {
     label: 'tennis ball',
     boundingBox: {
@@ -91,6 +91,10 @@ const dataset1 = [
       height: 0.2
     }
   }
-] as const satisfies DatasetObject[]
+] as const).map(x => ({
+  ...x,
+  confidence: 0.9,
+  trackingId: 0
+})) satisfies DatasetObject[]
 
 export const datasets = [dataset1] as const

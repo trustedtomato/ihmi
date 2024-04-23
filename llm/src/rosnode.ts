@@ -27,11 +27,6 @@ const armScanAction = nh.actionClientInterface(
 const ArmScanActionGoal = ros.require('arm_scanner').msg.ArmScanActionGoal
 // const goal = armScanAction.sendGoal(new ArmScanActionGoal({}))
 
-const startScanPublisher = nh.advertise(
-  '/start_scanning',
-  std_msgs.msg.Float32MultiArray
-)
-
 nh.subscribe('/new_arm_command', std_msgs.msg.Float32MultiArray, (msg) => {
   // ros.log.info(`Recieved ${msg.data}`)
   new Promise((resolve, reject) => {

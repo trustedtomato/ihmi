@@ -78,7 +78,7 @@ export const chat = async <T = string>(options: {
     : options.shouldStopStreaming || (() => false)
 
   const response = await ollama.chat({
-    model: 'mistral',
+    model: 'phi3',
     messages,
     format: isJson === 'object' ? 'json' : undefined,
     stream: true,

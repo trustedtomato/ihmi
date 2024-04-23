@@ -4,7 +4,7 @@ import { chat } from '../utils/chat.js'
 import { left, right } from '@sweet-monads/either'
 import debug from 'debug'
 
-const log = debug('app:algCotFewshot')
+const log = debug('app:algCotZeroshot')
 
 const exampleDataset = [
   'apple',
@@ -25,7 +25,7 @@ const createExampleMessagePair = (q: string, a: string) => [
   { role: 'assistant', content: `${a}\n` }
 ]
 
-export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
+export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label
@@ -36,52 +36,28 @@ export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
       {
         role: 'system',
         content: stripIndents`
-            You will be given a list of objects in the room,
-            and you need to select which objects to pick up based
-            on what the user asks for. It is crucial to pick up the right
-            amount of objects.
+          You will be given a list of objects in the room,
+          and you need to select which objects to pick up based
+          on what the user asks for. If the user asks for a single object,
+          the final answer should be a list of one object ID.
 
-            Think step-by-step. The conclusion should be a list of object IDs to be picked up.
-            If the user prompts you for something unrelated to picking up objects,
-            conclude with an empty list. If the user asks for
-            something that is not in the list of objects, conclude with
-            null.
-          `
+          The final answer should be a list of object IDs to be picked up.
+          If the user prompts you for something unrelated to picking up objects,
+          conclude with an empty list. If the user asks for
+          something that is not in the list of objects, conclude with
+          null.
+        `
       },
-      ...createExampleMessagePair(
-        'Pick up the apple.',
-        '"The apple" implies one apple. An apple is present with an ID of 0. Answer: [0].'
-      ),
-      ...createExampleMessagePair(
-        'Pick up the apple and a hat.',
-        '"The apple" implies one apple, and "a hat" implies one hat. An apple is present with an ID of 0, and a hat is present with an ID of 3. Answer: [0, 3].'
-      ),
-      ...createExampleMessagePair(
-        'Give me a fruit.',
-        "In the list of objects, there are multiple fruits: apples and bananas. Apples and bananas have the IDs of 0, 1 and 5. Let's pick the first one for consistency. Answer: [0]."
-      ),
-      ...createExampleMessagePair(
-        'Give me some bananas.',
-        '"Some bananas" implies more than one banana. Bananas are present with IDs of 1 and 5. Answer: [1, 5].'
-      ),
-      ...createExampleMessagePair(
-        'What time is it?',
-        'The user is not asking for any objects. Answer: [].'
-      ),
-      ...createExampleMessagePair(
-        'Pick up two apples',
-        'The user is asking for two apples, but there is only one apple present. Answer: null.'
-      ),
-      ...createExampleMessagePair(
-        'Pick up the orange.',
-        'There is no orange present. Answer: null.'
-      ),
       {
         role: 'user',
         content: stripIndent`
           Objects: ${JSON.stringify(objects)}
           Prompt: ${userPrompt}
         `
+      },
+      {
+        role: 'assistant',
+        content: "Let's think step-by-step."
       }
     ],
     // Sometimes Mistral continues the chat even after the response is complete,

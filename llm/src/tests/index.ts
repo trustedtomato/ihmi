@@ -19,7 +19,7 @@ for (const dataset of datasets) {
         const result = await algorithm(dataset, test.prompt)
         const score = result.fold(
           () => 0,
-          (objects) => test.score(objects as ActualDatasetObject[])
+          (objects) => test.score(objects as ActualDatasetObject[], dataset)
         )
         console.log(`Score: ${score}`)
       }

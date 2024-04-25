@@ -38,13 +38,14 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
         content: stripIndents`
             You will be given a list of objects in the room,
             and you need to select which objects to pick up based
-            on what the user asks for.
+            on what the user asks for. It is crucial to pick up the right
+            amount of objects.
 
-            Reply with a list of object IDs to be picked up.
-            If the user prompts you for something unrelated to picking up objects,
-            you should respond with an empty list of IDs. If the user asks for
+            Reply with a JSON array of object IDs to be picked up.
+            If the user asks for something unrelated to picking up objects,
+            you should respond with []. If the user asks for
             something that is not in the list of objects, you should respond with
-            null.
+            null, indicating that we need more searching.
           `
       },
       ...createExampleMessagePair('Pick up the apple.', '[0]'),

@@ -4,15 +4,15 @@ import { chat } from '../utils/chat.js'
 import { left, right } from '@sweet-monads/either'
 import debug from 'debug'
 
-const log = debug('app:algCotFewshot')
+const log = debug('app:algCotFewshotAlt')
 
 const exampleDataset = [
-  'apple',
-  'banana',
-  'tennis ball',
-  'hat',
-  'potato',
-  'banana'
+  'apple', // 0
+  'banana', // 1
+  'tennis ball', // 2
+  'hat', // 3
+  'potato', // 4
+  'banana' // 5
 ].map((label, index) => ({ label, id: index }))
 const createExampleMessagePair = (q: string, a: string) => [
   {
@@ -25,7 +25,7 @@ const createExampleMessagePair = (q: string, a: string) => [
   { role: 'assistant', content: `${a}\n` }
 ]
 
-export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
+export const algCotFewshotAlt: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label
@@ -49,32 +49,32 @@ export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
           `
       },
       ...createExampleMessagePair(
-        'Pick up the apple.',
-        '"The apple" implies one apple. An apple is present with an ID of 0. Answer: [0].'
+        'Pick up the banana.',
+        `Let's think step by step. We have to pick up 1 banana. Bananas are present with the IDs 1 and 5. We have to pick up 1 banana, so let's pick the first one for consistency. Answer: [1].`
       ),
       ...createExampleMessagePair(
-        'Pick up the apple and a hat.',
-        '"The apple" implies one apple, and "a hat" implies one hat. An apple is present with an ID of 0, and a hat is present with an ID of 3. Answer: [0, 3].'
+        'Pick up the banana and a hat.',
+        `Let's think step by step. We have to pick up 1 banana and 1 hat. Bananas are present with the IDs 1 and 5, and a hat is present with the ID 3. There is only 1 hat present, so we should pick that up. We have to pick up 1 banana, so let's pick the first one for consistency. Answer: [1, 3].`
       ),
       ...createExampleMessagePair(
         'Give me a fruit.',
-        "In the list of objects, there are multiple fruits: apples and bananas. Apples and bananas have the IDs of 0, 1 and 5. Let's pick the first one for consistency. Answer: [0]."
+        `Let's think step by step. We have to pick up 1 fruit. In the list of objects, there are multiple fruits: apples and bananas. Apples and bananas have the IDs of 0, 1 and 5. We have to pick up 1 fruit, so let's pick the first one for consistency. Answer: [0].`
       ),
       ...createExampleMessagePair(
         'Give me some bananas.',
-        '"Some bananas" implies more than one banana. Bananas are present with IDs of 1 and 5. Answer: [1, 5].'
+        `Let's think step by step. We have to pick up 2 bananas. Bananas are present with the IDs 1 and 5. We have to pick up 2 bananas, so let's pick both. Answer: [1, 5].`
       ),
       ...createExampleMessagePair(
         'What time is it?',
-        'The user is not asking for any objects. Answer: [].'
+        `Let's think step by step. The user is not asking for any objects. Therefore, we don't need to pick up anything. Answer: [].`
       ),
       ...createExampleMessagePair(
         'Pick up two apples',
-        'The user is asking for two apples, but there is only one apple present. Answer: null.'
+        `Let's think step by step. We have to pick up 2 apples. However, there is only 1 apple present, meaning the user is asking for something which is not present, so we need to search for more objects. Answer: null.`
       ),
       ...createExampleMessagePair(
         'Pick up the orange.',
-        'There is no orange present. Answer: null.'
+        `Let's think step by step. We have to pick up 1 orange. However, there is no orange present, so we need to search for more objects. Answer: null.`
       ),
       {
         role: 'user',
@@ -82,6 +82,10 @@ export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
           Objects: ${JSON.stringify(objects)}
           Prompt: ${userPrompt}
         `
+      },
+      {
+        role: 'assistant',
+        content: "Let's think step by step."
       }
     ],
     // Sometimes Mistral continues the chat even after the response is complete,

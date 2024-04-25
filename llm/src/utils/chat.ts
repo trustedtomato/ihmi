@@ -4,6 +4,11 @@ import { Either, left, right } from '@sweet-monads/either'
 import { asyncChainLeft } from './async-chain-left.js'
 import { stripIndent } from 'common-tags'
 
+export const defaults = {
+  model: 'llama3',
+  retries: 3
+}
+
 const log = debug('app:chat')
 
 type ShouldStopStreaming = (data: {
@@ -12,6 +17,7 @@ type ShouldStopStreaming = (data: {
 }) => boolean
 
 export const chat = async <T = string>(options: {
+  model?: ChatRequest['model']
   messages: ChatRequest['messages']
   /**
    * Transform the response to the desired type. Left string is interpreted as
@@ -48,7 +54,14 @@ export const chat = async <T = string>(options: {
    */
   maxLength?: number
 }): Promise<Either<string, T>> => {
-  const { transform, retries = 3, isJson = false, grammar, messages } = options
+  const {
+    transform,
+    retries = defaults.retries,
+    isJson = false,
+    grammar,
+    messages,
+    model = defaults.model
+  } = options
 
   if (isJson === 'object' && grammar) {
     throw new Error('Cannot specify both isJson and grammar')
@@ -78,7 +91,7 @@ export const chat = async <T = string>(options: {
     : options.shouldStopStreaming || (() => false)
 
   const response = await ollama.chat({
-    model: 'phi3',
+    model,
     messages,
     format: isJson === 'object' ? 'json' : undefined,
     stream: true,

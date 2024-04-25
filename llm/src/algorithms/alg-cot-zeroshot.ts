@@ -6,25 +6,6 @@ import debug from 'debug'
 
 const log = debug('app:algCotZeroshot')
 
-const exampleDataset = [
-  'apple',
-  'banana',
-  'tennis ball',
-  'hat',
-  'potato',
-  'banana'
-].map((label, index) => ({ label, id: index }))
-const createExampleMessagePair = (q: string, a: string) => [
-  {
-    role: 'user',
-    content: stripIndent`
-      Objects: ${JSON.stringify(exampleDataset)}
-      Prompt: ${q}
-    `
-  },
-  { role: 'assistant', content: `${a}\n` }
-]
-
 export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
@@ -38,14 +19,14 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
         content: stripIndents`
           You will be given a list of objects in the room,
           and you need to select which objects to pick up based
-          on what the user asks for. If the user asks for a single object,
-          the final answer should be a list of one object ID.
+          on what the user asks for. It is crucial to pick up the right
+          amount of objects.
 
-          The final answer should be a list of object IDs to be picked up.
-          If the user prompts you for something unrelated to picking up objects,
-          conclude with an empty list. If the user asks for
+          The final answer should be a JSON array of object IDs to be picked up.
+          If the user asks for something unrelated to picking up objects,
+          conclude with []. If the user asks for
           something that is not in the list of objects, conclude with
-          null.
+          null, indicating that we need more searching.
         `
       },
       {
@@ -57,7 +38,8 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
       },
       {
         role: 'assistant',
-        content: "Let's think step-by-step."
+        content:
+          "Let's work this out in a step by step way to be sure we have the right answer. "
       }
     ],
     // Sometimes Mistral continues the chat even after the response is complete,

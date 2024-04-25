@@ -36,8 +36,6 @@ function createScorer(
       }
     })
 
-    console.log(criteriaEvals)
-
     // If a criterium can't be satisfied, null is the right answer to the test.
     if (criteriaEvals.some(({ canBeSatisfied }) => !canBeSatisfied)) {
       return objects === null ? 1 : 0
@@ -54,8 +52,6 @@ function createScorer(
     const overallCountSatisfied =
       criteriaEvals.reduce((sum, { count }) => sum + count, 0) ===
       objects?.length
-
-    console.log(requestSatisfied, countSatisfied, overallCountSatisfied)
 
     return getScore([
       ...requestSatisfied,

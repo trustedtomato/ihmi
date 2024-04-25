@@ -1,100 +1,46 @@
 import type { DatasetObject } from './DatasetObject.js'
 
-const dataset1 = ([
-  {
-    label: 'tennis ball',
-    boundingBox: {
-      x: 0.1,
-      y: 0.2,
-      width: 0.3,
-      height: 0.4
-    }
-  },
-  {
-    label: 'scissors',
-    boundingBox: {
-      x: 0.5,
-      y: 0.6,
-      width: 0.7,
-      height: 0.8
-    }
-  },
-  {
-    label: 'paper towel',
-    boundingBox: {
-      x: 0.9,
-      y: 0.1,
-      width: 0.2,
-      height: 0.3
-    }
-  },
-  {
-    label: 'banana',
-    boundingBox: {
-      x: 0.4,
-      y: 0.5,
-      width: 0.6,
-      height: 0.7
-    }
-  },
-  {
-    label: 'banana',
-    boundingBox: {
-      x: 0.8,
-      y: 0.9,
-      width: 0.1,
-      height: 0.2
-    }
-  },
-  {
-    label: 'apple',
-    boundingBox: {
-      x: 0.1,
-      y: 0.2,
-      width: 0.3,
-      height: 0.4
-    }
-  },
-  {
-    label: 'mango',
-    boundingBox: {
-      x: 0.5,
-      y: 0.6,
-      width: 0.7,
-      height: 0.8
-    }
-  },
-  {
-    label: 'apple',
-    boundingBox: {
-      x: 0.9,
-      y: 0.1,
-      width: 0.2,
-      height: 0.3
-    }
-  },
-  {
-    label: 'apple',
-    boundingBox: {
-      x: 0.4,
-      y: 0.5,
-      width: 0.6,
-      height: 0.7
-    }
-  },
-  {
-    label: 'tennis ball',
-    boundingBox: {
-      x: 0.8,
-      y: 0.9,
-      width: 0.1,
-      height: 0.2
-    }
-  }
-] as const).map(x => ({
-  ...x,
-  confidence: 0.9,
-  trackingId: 0
-})) satisfies DatasetObject[]
+const dataset1Src = {
+  label: 'dataset1',
+  items: [
+    'tennis ball',
+    'scissors',
+    'paper towel',
+    'banana',
+    'banana',
+    'apple',
+    'mango',
+    'apple',
+    'apple',
+    'tennis ball'
+  ]
+} as const
 
-export const datasets = [dataset1] as const
+const dataset2Src = {
+  label: 'dataset2',
+  items: [
+    'apple',
+    'banana',
+    'newspaper',
+    'potato',
+    'cucumber',
+    'banana',
+    'apple',
+    'banana'
+  ]
+} as const
+
+export const datasets = [dataset1Src, dataset2Src].map((dataset) => ({
+  label: dataset.label,
+  items: dataset.items.map((item) => ({
+    label: item,
+    confidence: 0.9,
+    trackingId: 0,
+    boundingBox: {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1
+    }
+  })) satisfies DatasetObject[]
+}))

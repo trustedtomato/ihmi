@@ -64,7 +64,7 @@ export const chat = async <T = string>(options: {
   } = options
 
   if (isJson === 'object' && grammar) {
-    throw new Error('Cannot specify both isJson and grammar')
+    throw new Error('Cannot specify both isJson="object" and grammar')
   }
 
   if (isJson === 'any' && !grammar) {

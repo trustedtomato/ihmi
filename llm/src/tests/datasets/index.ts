@@ -32,10 +32,10 @@ const dataset2Src = {
 
 export const datasets = [dataset1Src, dataset2Src].map((dataset) => ({
   label: dataset.label,
-  items: dataset.items.map((item) => ({
+  items: dataset.items.map((item, index) => ({
     label: item,
     confidence: 0.9,
-    trackingId: 0,
+    trackingId: index,
     boundingBox: {
       x: 0,
       y: 0,

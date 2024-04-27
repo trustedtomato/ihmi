@@ -38,8 +38,7 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
       },
       {
         role: 'assistant',
-        content:
-          "Let's work this out in a step by step way to be sure we have the right answer. "
+        content: "Let's think step by step."
       }
     ],
     // Sometimes Mistral continues the chat even after the response is complete,
@@ -62,7 +61,7 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
         {
           role: 'user',
           content:
-            '"Some bananas" implies more than one banana. Bananas are present with IDs of 1 and 5. Therefore, the answer is [1, 5].'
+            '"Some bananas" implies more than one banana. Bananas are present with IDs of 1 and 5. Answer: [1, 5].'
         },
         {
           role: 'assistant',
@@ -71,7 +70,7 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
         {
           role: 'user',
           content:
-            'The user is asking for two apples, but there is only one apple present. Therefore, the answer is null.'
+            'The user is asking for two apples, but there is only one apple present. Answer: null.'
         },
         {
           role: 'assistant',
@@ -80,7 +79,7 @@ export const algCotZeroshot: Algorithm = async (dataset, userPrompt) => {
         {
           role: 'user',
           content:
-            '"The apple" implies one apple. An apple is present with an ID of 0. Therefore, the answer is [0].'
+            '"The apple" implies one apple. An apple is present with an ID of 0. Answer: [0].'
         },
         {
           role: 'assistant',

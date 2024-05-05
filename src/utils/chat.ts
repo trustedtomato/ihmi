@@ -19,6 +19,12 @@ type ShouldStopStreaming = (data: {
 export const chat = async <T = string>(options: {
   model?: ChatRequest['model']
   messages: ChatRequest['messages']
+  repeatLastN?: number
+  repeatPenalty?: number
+  temperature?: number
+  topK?: number
+  topP?: number
+  stop?: string[]
   /**
    * Transform the response to the desired type. Left string is interpreted as
    * error text, and the chat will continue with the error text as the next
@@ -99,7 +105,16 @@ export const chat = async <T = string>(options: {
       // @ts-expect-error: ollama-js types are not up to date with the patch
       // we made to Ollama When the types are updated, we can remove this
       // line, and probably also the patched version is no longer needed.
-      grammar
+      grammar,
+      top_k: options.topK,
+      top_p: options.topP,
+      temperature: options.temperature,
+      stop: options.stop,
+      repeat_last_n: options.repeatLastN,
+      repeat_penalty: options.repeatPenalty,
+      // A token is roughly 4 characters. Furthermore, -2 means "fill in the context".
+      num_predict:
+        typeof options.maxLength === 'number' ? options.maxLength / 4 : -2
     }
   })
 

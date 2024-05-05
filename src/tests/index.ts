@@ -8,7 +8,7 @@ import { defaults } from '../utils/chat.js'
 
 const tries = 10
 
-const models = ['llama3', 'phi3']
+const models = ['phi3']
 
 const results: {
   dataset: string

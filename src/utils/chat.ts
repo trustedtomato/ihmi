@@ -114,7 +114,8 @@ export const chat = async <T = string>(options: {
       repeat_penalty: options.repeatPenalty,
       // A token is roughly 4 characters. Furthermore, -2 means "fill in the context".
       num_predict:
-        typeof options.maxLength === 'number' ? options.maxLength / 4 : -2
+        // typeof options.maxLength === 'number' ? options.maxLength / 4 : -2
+        -2
     }
   })
 

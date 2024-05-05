@@ -3,6 +3,7 @@ import { Algorithm } from './Algorithm.js'
 import { chat } from '../utils/chat.js'
 import { left, right } from '@sweet-monads/either'
 import debug from 'debug'
+import { jsonRoot } from '../utils/grammars.js'
 
 const log = debug('app:algCotFewshot')
 
@@ -134,9 +135,7 @@ export const algCotFewshot: Algorithm = async (dataset, userPrompt) => {
         }
       ],
       isJson: 'any',
-      grammar: stripIndent(
-        `root ::= ("[" ([0-9]+ (("," | [ \t\n]+) [0-9]+)*)? "]") | "null"`
-      ),
+      grammar: `${jsonRoot} answerprefix (natintarray | "null") answerpostfix`,
       // grammar: stripIndent(`root ::= ([0-9]+ ("," [0-9]+)*)?[\n ]+`),
       maxLength: 100,
       transform: (objIds: number[] | null) => {

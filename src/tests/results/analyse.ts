@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags'
-import results from './results-2.json'
+import results from './results-6.json'
 import fs from 'fs'
 
 /*

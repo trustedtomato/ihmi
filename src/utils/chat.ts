@@ -3,6 +3,7 @@ import debug from 'debug'
 import { Either, left, right } from '@sweet-monads/either'
 import { asyncChainLeft } from './async-chain-left.js'
 import { stripIndent } from 'common-tags'
+import { tryCatch } from './try-catch.js'
 
 export const defaults = {
   model: 'llama3',
@@ -149,9 +150,14 @@ export const chat = async <T = string>(options: {
   }
 
   log('parsing response')
-  const responseObject = isJson ? JSON.parse(responseText) : responseText
 
-  const result = transform ? transform(responseObject) : right(responseObject)
+  const responseObject = tryCatch(() => {
+    return isJson ? JSON.parse(responseText) : responseText
+  })
+
+  const result = responseObject.chain((r) => {
+    return transform ? transform(r) : right(r)
+  })
 
   return asyncChainLeft(result, async (error) => {
     if (retries <= 0) {

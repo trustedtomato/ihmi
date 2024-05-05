@@ -1,30 +1,12 @@
-import { stripIndent, stripIndents } from 'common-tags'
-import { Algorithm } from './Algorithm.js'
-import { chat } from '../utils/chat.js'
 import { left, right } from '@sweet-monads/either'
+import { stripIndent, stripIndents } from 'common-tags'
 import debug from 'debug'
+import { chat } from '../utils/chat.js'
 import { jsonRoot } from '../utils/grammars.js'
+import { shots } from '../utils/messages/basic.js'
+import { Algorithm } from './Algorithm.js'
 
 const log = debug('app:algFewshot')
-
-const exampleDataset = [
-  'apple',
-  'banana',
-  'tennis ball',
-  'hat',
-  'potato',
-  'banana'
-].map((label, index) => ({ label, id: index }))
-const createExampleMessagePair = (q: string, a: string) => [
-  {
-    role: 'user',
-    content: stripIndent`
-      Objects: ${JSON.stringify(exampleDataset)}
-      Prompt: ${q}
-    `
-  },
-  { role: 'assistant', content: `Object IDs: ${a}` }
-]
 
 export const algFewshot: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
@@ -37,47 +19,28 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
       {
         role: 'system',
         content: stripIndents`
-            You will be given a list of objects in the room,
-            and you need to select which objects to pick up based
-            on what the user asks for. It is crucial to pick up the right
-            amount of objects.
+          You will be given a list of objects in the room,
+          and you need to select which objects to pick up based
+          on what the user asks for.
 
-            Reply with a JSON array of object IDs to be picked up.
-            If the user asks for something unrelated to picking up objects,
-            you should respond with []. If the user asks for
-            something that is not in the list of objects, you should respond with
-            null, indicating that we need more searching.
-          `
+          Reply with a JSON array of object IDs to be picked up.
+          If the user asks for something unrelated to picking up objects,
+          you should respond with [].
+        `
       },
-      ...createExampleMessagePair('Pick up the apple.', '[0]'),
-      ...createExampleMessagePair('Pick up the apple and a hat.', '[0,3]'),
-      ...createExampleMessagePair('Give me a fruit.', '[1]'),
-      ...createExampleMessagePair('Give me some bananas.', '[1, 5]'),
-      ...createExampleMessagePair('What time is it?', '[]'),
-      ...createExampleMessagePair('The weather is nice.', '[]'),
-      ...createExampleMessagePair('Pick up two apples', 'null'),
-      ...createExampleMessagePair('Pick up the orange.', 'null'),
+      ...shots,
       {
         role: 'user',
         content: stripIndent`
           Objects: ${JSON.stringify(objects)}
           Prompt: ${userPrompt}
         `
-      },
-      {
-        role: 'assistant',
-        content: 'Object IDs:'
       }
     ],
     isJson: 'any',
+    grammar: `${jsonRoot} answerprefix natintarray answerpostfix`,
     maxLength: 100,
-    grammar: `${jsonRoot} answerprefix (natintarray | "null") answerpostfix`,
-    // grammar: stripIndent(`root ::= ([0-9]+ ("," [0-9]+)*)?[\n ]+`),
-    transform: (objIds: number[] | null) => {
-      if (objIds === null) {
-        return right(null)
-      }
-
+    transform: ({ answer: objIds }: { answer: number[] }) => {
       if (objIds.length !== new Set(objIds).size) {
         return left('Try again. Duplicate object IDs are not allowed.')
       }
@@ -89,7 +52,6 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
           )}`
         )
       }
-      // const objs = objIds.map(id => objects[id])
       const datasetObjs = objIds.map((id) => dataset[id])
       return right(datasetObjs)
     }

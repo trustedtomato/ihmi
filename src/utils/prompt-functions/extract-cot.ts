@@ -1,28 +1,26 @@
 import { left, right } from '@sweet-monads/either'
-import { stripIndent } from 'common-tags'
-import debug from 'debug'
-import { chat } from '../utils/chat.js'
-import { jsonRoot } from '../utils/grammars.js'
-import { systemMessage } from '../utils/messages/basic.js'
-import { Algorithm } from './Algorithm.js'
+import { DatasetObject } from '../../tests/datasets/DatasetObject.js'
+import { chat } from '../chat.js'
+import { jsonRoot } from '../grammars.js'
+import {
+  extractCotShots,
+  extractCotSystemMessage
+} from '../messages/extract-cot.js'
 
-const log = debug('app:algZeroshot')
-
-export const algZeroshot: Algorithm = async (dataset, userPrompt) => {
-  const objects = dataset.map((object, index) => ({
-    id: index,
-    label: object.label
-  }))
-
+export const extractCotAnswer = async ({
+  cot,
+  dataset
+}: {
+  cot: string
+  dataset: DatasetObject[]
+}) => {
   const response = await chat({
     messages: [
-      systemMessage,
+      extractCotSystemMessage,
+      ...extractCotShots,
       {
         role: 'user',
-        content: stripIndent`
-          Objects: ${JSON.stringify(objects)}
-          Prompt: ${userPrompt}
-        `
+        content: cot
       }
     ],
     isJson: 'any',
@@ -32,7 +30,7 @@ export const algZeroshot: Algorithm = async (dataset, userPrompt) => {
       if (objIds.length !== new Set(objIds).size) {
         return left('Try again. Duplicate object IDs are not allowed.')
       }
-      const nonexistentIds = objIds.filter((id) => !objects[id])
+      const nonexistentIds = objIds.filter((id) => !dataset[id])
       if (nonexistentIds.length > 0) {
         return left(
           `Try again. The following object IDs do not exist: ${nonexistentIds.join(
@@ -40,10 +38,10 @@ export const algZeroshot: Algorithm = async (dataset, userPrompt) => {
           )}`
         )
       }
+      // const objs = objIds.map(id => objects[id])
       const datasetObjs = objIds.map((id) => dataset[id])
       return right(datasetObjs)
     }
   })
-
   return response
 }

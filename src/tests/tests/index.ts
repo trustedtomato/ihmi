@@ -8,10 +8,7 @@ function createScorer(
     count: number | 'all'
   }[]
 ) {
-  return (
-    objects: ActualDatasetObject[] | null,
-    dataset: ActualDatasetObject[]
-  ) => {
+  return (objects: ActualDatasetObject[], dataset: ActualDatasetObject[]) => {
     const criteriaEvals = criteria.map(({ test, count: rawCount }) => {
       const datasetPass =
         typeof test === 'string'
@@ -25,21 +22,16 @@ function createScorer(
           ? objects.filter((object) => object.label === test)
           : objects.filter(test)
 
-      const count = rawCount === 'all' ? datasetPass.length : rawCount
-
-      const canBeSatisfied = datasetPass.length >= count
+      const count =
+        rawCount === 'all'
+          ? datasetPass.length
+          : Math.min(rawCount, datasetPass.length)
 
       return {
         count,
-        objectsPass,
-        canBeSatisfied
+        objectsPass
       }
     })
-
-    // If a criterium can't be satisfied, null is the right answer to the test.
-    if (criteriaEvals.some(({ canBeSatisfied }) => !canBeSatisfied)) {
-      return objects === null ? 1 : 0
-    }
 
     const requestSatisfied = criteriaEvals.map(({ objectsPass, count }) => {
       return objectsPass.length >= count

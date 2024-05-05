@@ -115,7 +115,7 @@ export const chat = async <T = string>(options: {
       // A token is roughly 4 characters. Furthermore, -2 means "fill in the context".
       num_predict:
         // typeof options.maxLength === 'number' ? options.maxLength / 4 : -2
-        -2
+        -1
     }
   })
 

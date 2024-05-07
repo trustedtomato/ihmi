@@ -1,9 +1,9 @@
 import { left, right } from '@sweet-monads/either'
-import { stripIndent, stripIndents } from 'common-tags'
+import { stripIndent } from 'common-tags'
 import debug from 'debug'
 import { chat } from '../utils/chat.js'
 import { jsonRoot } from '../utils/grammars.js'
-import { shots } from '../utils/messages/basic.js'
+import { shots, systemMessage } from '../utils/messages/basic.js'
 import { Algorithm } from './Algorithm.js'
 
 const log = debug('app:algFewshot')
@@ -16,18 +16,7 @@ export const algFewshot: Algorithm = async (dataset, userPrompt) => {
 
   const response = await chat({
     messages: [
-      {
-        role: 'system',
-        content: stripIndents`
-          You will be given a list of objects in the room,
-          and you need to select which objects to pick up based
-          on what the user asks for.
-
-          Reply with a JSON array of object IDs to be picked up.
-          If the user asks for something unrelated to picking up objects,
-          you should respond with [].
-        `
-      },
+      systemMessage,
       ...shots,
       {
         role: 'user',

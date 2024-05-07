@@ -3,13 +3,16 @@ import { stripIndent } from 'common-tags'
 import debug from 'debug'
 import { chat } from '../utils/chat.js'
 import { jsonRoot } from '../utils/grammars.js'
-import { systemMessageWithoutUnrelated } from '../utils/messages/basic.js'
+import {
+  shotsWithoutUnrelated,
+  systemMessageWithoutUnrelated
+} from '../utils/messages/basic.js'
 import { isUserPromptRelatedToPickUp } from '../utils/prompt-functions/is-user-prompt-related-to-pickup.js'
 import { Algorithm } from './Algorithm.js'
 
-const log = debug('app:algZeroshot')
+const log = debug('app:algSplitFewshot')
 
-export const algSplitZeroshot: Algorithm = async (dataset, userPrompt) => {
+export const algSplitFewshot: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label
@@ -24,6 +27,7 @@ export const algSplitZeroshot: Algorithm = async (dataset, userPrompt) => {
   const response = await chat({
     messages: [
       systemMessageWithoutUnrelated,
+      ...shotsWithoutUnrelated,
       {
         role: 'user',
         content: stripIndent`

@@ -10,16 +10,8 @@ const tries = 10
 
 const models = ['phi3', 'llama3']
 
-const results: {
-  dataset: string
-  test: string
-  algorithm: string
-  score: number
-  time: number
-  model: string
-  result: string
-}[] = []
-
+fs.writeFileSync('results.json', '[')
+let first = true
 for (const model of models) {
   defaults.model = model
   console.log(chalk.bgYellow.whiteBright.bold(` Model: ${model} `))
@@ -44,7 +36,7 @@ for (const model of models) {
           )
           const end = performance.now()
           console.log(`Score: ${score}`)
-          results.push({
+          const item = {
             dataset: dataset.label,
             test: test.prompt,
             algorithm: algorithm.name,
@@ -55,10 +47,17 @@ for (const model of models) {
               (error) => error,
               (objects) => JSON.stringify(objects)
             )
-          })
-          fs.writeFileSync('results.json', JSON.stringify(results))
+          }
+          if (first) {
+            fs.appendFileSync('results.json', JSON.stringify(item))
+            first = false
+          } else {
+            fs.appendFileSync('results.json', ',\n' + JSON.stringify(item))
+          }
+          // fs.writeFileSync('results.json', JSON.stringify(results))
         }
       }
     }
   }
 }
+fs.appendFileSync('results.json', ']')

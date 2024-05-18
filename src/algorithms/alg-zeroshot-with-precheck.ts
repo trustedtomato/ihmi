@@ -7,9 +7,12 @@ import { systemMessageWithoutUnrelated } from '../utils/messages/basic.js'
 import { isUserPromptRelatedToPickUp } from '../utils/prompt-functions/is-user-prompt-related-to-pickup.js'
 import { Algorithm } from './Algorithm.js'
 
-const log = debug('app:algZeroshot')
+const log = debug('app:algZeroshotWithPrecheck')
 
-export const algSplitZeroshot: Algorithm = async (dataset, userPrompt) => {
+export const algZeroshotWithPrecheck: Algorithm = async (
+  dataset,
+  userPrompt
+) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label

@@ -10,9 +10,12 @@ import {
 import { isUserPromptRelatedToPickUp } from '../utils/prompt-functions/is-user-prompt-related-to-pickup.js'
 import { Algorithm } from './Algorithm.js'
 
-const log = debug('app:algSplitFewshot')
+const log = debug('app:algFewshotWithPrecheck')
 
-export const algSplitFewshot: Algorithm = async (dataset, userPrompt) => {
+export const algFewshotWithPrecheck: Algorithm = async (
+  dataset,
+  userPrompt
+) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label

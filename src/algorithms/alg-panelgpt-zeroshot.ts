@@ -5,9 +5,9 @@ import { cotSystemMessage } from '../utils/messages/cot.js'
 import { extractCotAnswer } from '../utils/prompt-functions/extract-cot.js'
 import { Algorithm } from './Algorithm.js'
 
-const log = debug('app:algTotZeroshot')
+const log = debug('app:algPanelgptZeroshot')
 
-export const algTotZeroshot: Algorithm = async (dataset, userPrompt) => {
+export const algPanelgptZeroshot: Algorithm = async (dataset, userPrompt) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label

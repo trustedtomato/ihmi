@@ -10,9 +10,12 @@ import { extractCotAnswer } from '../utils/prompt-functions/extract-cot.js'
 import { isUserPromptRelatedToPickUp } from '../utils/prompt-functions/is-user-prompt-related-to-pickup.js'
 import { Algorithm } from './Algorithm.js'
 
-const log = debug('app:algSplitCotFewshotAlt')
+const log = debug('app:algCotFewshotAltWithPrecheck')
 
-export const algSplitCotFewshotAlt: Algorithm = async (dataset, userPrompt) => {
+export const algCotFewshotAltWithPrecheck: Algorithm = async (
+  dataset,
+  userPrompt
+) => {
   const objects = dataset.map((object, index) => ({
     id: index,
     label: object.label

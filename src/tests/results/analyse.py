@@ -93,7 +93,7 @@ for algorithm, models in scores.items():
                 if is_vote_correct:
                     model_entry['correct'] += 1
                 else:
-                    if algorithm == 'algSplitCotFewshotAlt' and model == 'llama3':
+                    if (algorithm == 'algSplitCotFewshotAlt' or algorithm == 'algCotFewshotAlt' or algorithm == 'algCotZeroshot') and model == 'llama3':
                         print(strip_indent(f"""
                             Dataset: {dataset}
                             Algorithm: {algorithm}
@@ -104,11 +104,7 @@ for algorithm, models in scores.items():
 
                 model_entry['individualCorrect'] += details['correctVotes']
 
-# Sample data
-# accuracies = [0.8, 0.85, 0.9, 0.75, 0.95]
-# times_taken = [10, 15, 20, 25, 30]
-# labels = ['algCotZeroshot', 'B', 'C', 'D', 'E']
-
+# Make plots comparing all algorithms for each model
 models = ['llama3', 'phi3']
 model_names = ['Llama 3', 'Phi-3']
 
@@ -163,15 +159,3 @@ for (model, model_name) in zip(models, model_names):
   # Show the plot
   plt.grid(True)
   plt.savefig('plot-' + model + '.pdf', dpi=300, bbox_inches='tight')
-
-if False:
-
-  plt.scatter(times_taken, accuracies, marker='x')
-
-  # Add labels to each point
-  texts = []
-  for i, label in enumerate(labels):
-      texts.append(plt.text(times_taken[i], accuracies[i], label, fontsize=font_size))
-
-  # Remove overlapping texts
-  adjust_text(texts, arrowprops=dict(arrowstyle='->', color='red'))

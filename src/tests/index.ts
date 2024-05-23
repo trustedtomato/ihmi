@@ -7,6 +7,7 @@ import fs from 'fs'
 import { defaults } from '../utils/chat.js'
 import { runWithRetry } from '../utils/run-with-retry.js'
 import { logLine } from '../utils/log-debug.js'
+import { execa } from 'execa'
 
 const tries = 10
 
@@ -100,7 +101,14 @@ for (const [modelIndex, model] of Object.entries(models)) {
             async () => await algorithm(dataset.items, test.prompt),
             {
               retries: Infinity,
-              retryDelay: 1000
+              retryDelay: 1000,
+              timeout: 60 * 1000,
+              timeoutFn: async () => {
+                logLine('Timeout')
+                // We need to kill the Ollama server in case it's stuck
+                await execa`pkill -9 ollama`
+                throw new Error('Timeout')
+              }
             }
           )
           const score = result.fold(

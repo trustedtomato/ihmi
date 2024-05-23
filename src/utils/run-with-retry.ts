@@ -7,14 +7,20 @@ export async function runWithRetry<T>(
   fn: () => Promise<T>,
   {
     retries = 3,
-    retryDelay = 1000
+    retryDelay = 1000,
+    timeout = 60 * 1000,
+    timeoutFn = () => {
+      throw new Error('Timeout')
+    }
   }: {
     retries?: number
     retryDelay?: number
+    timeout?: number
+    timeoutFn?: () => Promise<never> | never
   } = {}
 ): Promise<T> {
   try {
-    return await fn()
+    return await Promise.any([fn(), wait(timeout).then(timeoutFn)])
   } catch (err) {
     if (retries <= 0) {
       throw err

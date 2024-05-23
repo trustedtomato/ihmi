@@ -124,6 +124,10 @@ for algorithm, models in first_scores_acc.items():
     times_taken.append(details['timeTotal'])
     labels.append(f'{algorithm}')
 
+# Sort the data according to the x position (time taken)
+first_sorted_data = sorted(zip(times_taken, labels))
+label_order = [label for _, label in first_sorted_data]
+
 for (model, model_name) in zip(models, model_names):
 
     # Font size
@@ -140,10 +144,6 @@ for (model, model_name) in zip(models, model_names):
 
     plt.ylim(0.2, 1)
     plt.xlim(0, 2)
-
-    # Sort the data according to the x position (time taken)
-    first_sorted_data = sorted(zip(times_taken, labels))
-    label_order = [label for _, label in first_sorted_data]
 
     first_run = True
     colors = ['red', 'blue', 'pink', 'green', 'yellow', '#6f6', 'orange', 'cyan', 'black', 'gray']

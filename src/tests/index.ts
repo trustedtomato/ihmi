@@ -8,6 +8,7 @@ import { defaults } from '../utils/chat.js'
 import { runWithRetry } from '../utils/run-with-retry.js'
 import { logLine } from '../utils/log-debug.js'
 import { execa } from 'execa'
+import { wait } from '../utils/wait.js'
 
 const tries = 10
 
@@ -100,7 +101,7 @@ for (const [modelIndex, model] of Object.entries(models)) {
         logLine(chalk.bgBlue.whiteBright.bold(` Algorithm: ${algorithm.name} `))
         for (let i = 0; i < tries; i++) {
           logLine(chalk.bgMagenta.whiteBright.bold(` Try #${+(i + 1)} `))
-          const start = performance.now()
+          let start = performance.now()
           // In case Ollama server is down, for example, we want to keep trying.
           const result = await runWithRetry(
             async () => await algorithm(dataset.items, test.prompt),
@@ -112,6 +113,7 @@ for (const [modelIndex, model] of Object.entries(models)) {
                 logLine('Timeout')
                 // We need to kill the Ollama server in case it's stuck
                 await execa`pkill -9 ollama`
+                start = performance.now()
                 throw new Error('Timeout')
               }
             }

@@ -20,7 +20,7 @@ export async function runWithRetry<T>(
   } = {}
 ): Promise<T> {
   try {
-    return await Promise.any([fn(), wait(timeout).then(timeoutFn)])
+    return await Promise.race([fn(), wait(timeout).then(timeoutFn)])
   } catch (err) {
     if (retries <= 0) {
       throw err

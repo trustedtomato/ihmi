@@ -113,6 +113,8 @@ for (const [modelIndex, model] of Object.entries(models)) {
                 logLine('Timeout')
                 // We need to kill the Ollama server in case it's stuck
                 await execa`pkill -9 ollama`
+                // Let's give it a break
+                await wait(10000)
                 start = performance.now()
                 throw new Error('Timeout')
               }

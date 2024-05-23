@@ -3,6 +3,16 @@ import debug from 'debug'
 
 const log = debug('app:run-with-retry')
 
+type ReturnValue<T> =
+  | {
+      value: T
+      timeout: false
+    }
+  | {
+      value: null
+      timeout: true
+    }
+
 export async function runWithRetry<T>(
   fn: () => Promise<T>,
   {
@@ -20,7 +30,18 @@ export async function runWithRetry<T>(
   } = {}
 ): Promise<T> {
   try {
-    return await Promise.race([fn(), wait(timeout).then(timeoutFn)])
+    const result = await Promise.race([
+      fn().then((value): ReturnValue<T> => {
+        return { value, timeout: false }
+      }),
+      wait(timeout).then((): ReturnValue<T> => {
+        return { value: null, timeout: true }
+      })
+    ])
+    if (result.timeout) {
+      return await timeoutFn()
+    }
+    return result.value
   } catch (err) {
     if (retries <= 0) {
       throw err

@@ -34,6 +34,7 @@ if (fs.existsSync('results.json')) {
       }
       logLine(`Renaming results.json to results-${i}.json`)
       fs.renameSync('results.json', `results-${i}.json`)
+      break
     }
   } else if (lastLine.startsWith('[')) {
     // If the last line is an array opening bracket, it means the tests were

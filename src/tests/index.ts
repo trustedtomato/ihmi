@@ -5,37 +5,108 @@ import { tests } from './tests/index.js'
 import { algorithms } from './algorithms.js'
 import fs from 'fs'
 import { defaults } from '../utils/chat.js'
+import { runWithRetry } from '../utils/run-with-retry.js'
+import { logLine } from '../utils/log-debug.js'
 
 const tries = 10
 
 const models = ['phi3', 'llama3']
 
-fs.writeFileSync('results.json', '[')
-let first = true
-for (const model of models) {
+interface Result {
+  dataset: string
+  test: string
+  algorithm: string
+  score: number
+  time: number
+  model: string
+  result: string
+}
+
+// We want to keep track of the last result in case the tests were interrupted
+let lastResultIndices: {
+  model: number
+  dataset: number
+  test: number
+  algorithm: number
+} | null = null
+if (fs.existsSync('results.json')) {
+  const lines = fs.readFileSync('results.json', 'utf8').split('\n')
+  const lastLine = lines[lines.length - 1]
+  if (lastLine.endsWith(']') || lastLine.startsWith('[')) {
+    console.error(
+      'results.json already exists and is complete. Please move it to a different location before running the tests again.'
+    )
+    process.exit(0)
+  }
+  const lastResult = JSON.parse(lastLine)
+  lastResultIndices = {
+    model: models.indexOf(lastResult.model),
+    dataset: datasets.findIndex(
+      (dataset) => dataset.label === lastResult.dataset
+    ),
+    test: tests.findIndex((test) => test.prompt === lastResult.test),
+    algorithm: algorithms.findIndex(
+      (algorithm) => algorithm.name === lastResult.algorithm
+    )
+  }
+}
+
+if (!lastResultIndices) {
+  fs.writeFileSync('results.json', '[')
+}
+let first = !lastResultIndices
+
+for (const [modelIndex, model] of Object.entries(models)) {
+  if (lastResultIndices && +modelIndex < lastResultIndices.model) {
+    continue
+  }
   defaults.model = model
-  console.log(chalk.bgYellow.whiteBright.bold(` Model: ${model} `))
-  for (const dataset of datasets) {
-    console.log(chalk.bgRed.whiteBright.bold(' Dataset '))
-    console.log(dataset)
-    for (const test of tests) {
-      console.log(chalk.bgGreen.whiteBright.bold(' Prompt '))
-      console.log(test.prompt)
-      for (const algorithm of algorithms) {
-        console.log(
-          chalk.bgBlue.whiteBright.bold(` Algorithm: ${algorithm.name} `)
-        )
+  logLine(chalk.bgYellow.whiteBright.bold(` Model: ${model} `))
+  for (const [datasetIndex, dataset] of Object.entries(datasets)) {
+    if (lastResultIndices && +datasetIndex < lastResultIndices.dataset) {
+      continue
+    }
+    logLine(chalk.bgRed.whiteBright.bold(' Dataset '))
+    logLine(dataset)
+    for (const [testIndex, test] of Object.entries(tests)) {
+      if (lastResultIndices && +testIndex < lastResultIndices.test) {
+        continue
+      }
+      logLine(chalk.bgGreen.whiteBright.bold(' Prompt '))
+      logLine(test.prompt)
+      for (const [algorithmIndex, algorithm] of Object.entries(algorithms)) {
+        if (
+          lastResultIndices &&
+          +algorithmIndex < lastResultIndices.algorithm
+        ) {
+          continue
+        }
+        // If we got this far, it means we reached the last result, and we want
+        // to start the run now from this place, so we reset lastResultIndices.
+        // Note that this means this test case will be run more than "tries"
+        // times, but that's fine. We can just ignore the extra results.
+        if (lastResultIndices) {
+          lastResultIndices = null
+        }
+        logLine(chalk.bgBlue.whiteBright.bold(` Algorithm: ${algorithm.name} `))
         for (let i = 0; i < tries; i++) {
-          console.log(chalk.bgMagenta.whiteBright.bold(` Try #${+(i + 1)} `))
+          logLine(chalk.bgMagenta.whiteBright.bold(` Try #${+(i + 1)} `))
           const start = performance.now()
-          const result = await algorithm(dataset.items, test.prompt)
+          // In case Ollama server is down, for example, we want to keep trying
+          const result = await runWithRetry(
+            async () => await algorithm(dataset.items, test.prompt),
+            {
+              retries: Infinity,
+              retryDelay: 1000
+            }
+          )
           const score = result.fold(
             () => 0,
             (objects) =>
               test.score(objects as ActualDatasetObject[], dataset.items)
           )
           const end = performance.now()
-          console.log(`Score: ${score}`)
+          logLine(`Score: ${score}`)
           const item = {
             dataset: dataset.label,
             test: test.prompt,

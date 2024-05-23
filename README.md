@@ -24,8 +24,13 @@ Some of the more interesting files include:
 
 ### Running the tests
 
-1. Run ollama by going into its directory and running `while true; do ./ollama serve && break || sleep 1; done`
+1. Run ollama by going into its directory and running `while true; do ./ollama serve > /dev/null 2>&1 || sleep 1; done`
    - The script makes sure to restart the Ollama server in case of a crash, which does happen sometimes
+   - The script also suppresses the output of the Ollama server, which could
+     potentially be very verbose and affect the performance metrics of the test
+     suite. For development though, you could remove it, in which case you'd
+     want to remove the `> /dev/null 2>&1` part of the command
 2. Run `npm run test`
    - You can run `DEBUG="app:test,app:test:*" npm run test` to see the test suite output
    - You can run `DEBUG="app:*" npm run test` to see the test suite output and the debugging output of all other parts of the codebase
+   - To run the test suite multiple times, you could use `while true; do npm run test; done`

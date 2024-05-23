@@ -40,7 +40,10 @@ export const algPanelgptZeroshot: Algorithm = async (dataset, userPrompt) => {
       return (
         /Answer: (\[.*?\])/.test(fullResponse) ||
         fullResponse.includes('Objects:') ||
-        fullResponse.includes('Prompt:')
+        fullResponse.includes('\nobjects:') ||
+        fullResponse.includes('Prompt:') ||
+        fullResponse.includes('\nprompt:') ||
+        fullResponse.includes('===')
       )
     }
   })

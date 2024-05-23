@@ -13,16 +13,6 @@ const tries = 10
 
 const models = ['phi3', 'llama3']
 
-interface Result {
-  dataset: string
-  test: string
-  algorithm: string
-  score: number
-  time: number
-  model: string
-  result: string
-}
-
 // We want to keep track of the last result in case the tests were interrupted
 let lastResultIndices: {
   model: number
@@ -30,25 +20,39 @@ let lastResultIndices: {
   test: number
   algorithm: number
 } | null = null
+
 if (fs.existsSync('results.json')) {
   const lines = fs.readFileSync('results.json', 'utf8').split('\n')
   const lastLine = lines[lines.length - 1]
-  if (lastLine.endsWith(']') || lastLine.startsWith('[')) {
-    console.error(
-      'results.json already exists and is complete. Please move it to a different location before running the tests again.'
-    )
-    process.exit(0)
-  }
-  const lastResult = JSON.parse(lastLine)
-  lastResultIndices = {
-    model: models.indexOf(lastResult.model),
-    dataset: datasets.findIndex(
-      (dataset) => dataset.label === lastResult.dataset
-    ),
-    test: tests.findIndex((test) => test.prompt === lastResult.test),
-    algorithm: algorithms.findIndex(
-      (algorithm) => algorithm.name === lastResult.algorithm
-    )
+  if (lastLine.endsWith(']')) {
+    // If the last line is an array closing bracket, it means the tests were
+    // finished successfully, so we need to rename the file to keep the results,
+    // and then start a new results.json file.
+    for (let i = 2; ; i++) {
+      if (fs.existsSync(`results-${i}.json`)) {
+        continue
+      }
+      logLine(`Renaming results.json to results-${i}.json`)
+      fs.renameSync('results.json', `results-${i}.json`)
+    }
+  } else if (lastLine.startsWith('[')) {
+    // If the last line is an array opening bracket, it means the tests were
+    // interrupted in the very beginning, so we can just delete the file.
+    fs.unlinkSync('results.json')
+  } else {
+    // If the last line is a JSON object, it means the tests were interrupted
+    // in the middle, so we want to start from that point.
+    const lastResult = JSON.parse(lastLine)
+    lastResultIndices = {
+      model: models.indexOf(lastResult.model),
+      dataset: datasets.findIndex(
+        (dataset) => dataset.label === lastResult.dataset
+      ),
+      test: tests.findIndex((test) => test.prompt === lastResult.test),
+      algorithm: algorithms.findIndex(
+        (algorithm) => algorithm.name === lastResult.algorithm
+      )
+    }
   }
 }
 

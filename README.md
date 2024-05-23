@@ -27,5 +27,5 @@ Some of the more interesting files include:
 1. Run ollama by going into its directory and running `while true; do ./ollama serve && break || sleep 1; done`
    - The script makes sure to restart the Ollama server in case of a crash, which does happen sometimes
 2. Run `npm run test`
-   - You can run `DEBUG="app:test:*" npm run test` to see the test suite output
+   - You can run `DEBUG="app:test,app:test:*" npm run test` to see the test suite output
    - You can run `DEBUG="app:*" npm run test` to see the test suite output and the debugging output of all other parts of the codebase

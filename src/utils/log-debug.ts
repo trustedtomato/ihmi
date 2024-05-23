@@ -1,11 +1,12 @@
-export const isDebug = !!process.env.DEBUG
+import debug from 'debug'
+export const isTestDebugEnabled = debug.enabled('app:test:*')
 export const logLine = (...lines: any[]) => {
-  if (isDebug) {
+  if (isTestDebugEnabled) {
     console.log(...lines)
   }
 }
 export const logWrite = (str: string) => {
-  if (isDebug) {
+  if (isTestDebugEnabled) {
     process.stdout.write(str)
   }
 }

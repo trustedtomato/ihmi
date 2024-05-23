@@ -51,12 +51,15 @@ if (fs.existsSync('results.json')) {
   }
 }
 
+// Start the results array if it doesn't exist yet
 if (!lastResultIndices) {
   fs.writeFileSync('results.json', '[')
 }
 let first = !lastResultIndices
 
 for (const [modelIndex, model] of Object.entries(models)) {
+  // We'll skip the models until we reach the last result. Then we reset
+  // lastResultIndices to null to start running from that point.
   if (lastResultIndices && +modelIndex < lastResultIndices.model) {
     continue
   }
@@ -92,7 +95,7 @@ for (const [modelIndex, model] of Object.entries(models)) {
         for (let i = 0; i < tries; i++) {
           logLine(chalk.bgMagenta.whiteBright.bold(` Try #${+(i + 1)} `))
           const start = performance.now()
-          // In case Ollama server is down, for example, we want to keep trying
+          // In case Ollama server is down, for example, we want to keep trying.
           const result = await runWithRetry(
             async () => await algorithm(dataset.items, test.prompt),
             {
@@ -125,7 +128,6 @@ for (const [modelIndex, model] of Object.entries(models)) {
           } else {
             fs.appendFileSync('results.json', ',\n' + JSON.stringify(item))
           }
-          // fs.writeFileSync('results.json', JSON.stringify(results))
         }
       }
     }

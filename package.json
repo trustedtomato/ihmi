@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "npx tsx src/tests/index.ts",
-    "analyse": "npx tsx src/tests/results/analyse.ts"
+    "analyse": "python src/tests/results/analyse.py"
   },
   "author": "",
   "license": "ISC",

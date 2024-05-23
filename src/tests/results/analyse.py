@@ -119,8 +119,8 @@ model_names = ['Llama 3', 'Phi-3']
 first_scores_acc = results[0]
 times_taken = []
 labels = []
-for algorithm, models in first_scores_acc.items():
-    _model, details = list(models.items())[0]
+for algorithm, _models in first_scores_acc.items():
+    _model, details = list(_models.items())[0]
     times_taken.append(details['timeTotal'])
     labels.append(f'{algorithm}')
 

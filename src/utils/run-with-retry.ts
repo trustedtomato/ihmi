@@ -1,4 +1,7 @@
 import { wait } from './wait.js'
+import debug from 'debug'
+
+const log = debug('app:run-with-retry')
 
 export async function runWithRetry<T>(
   fn: () => Promise<T>,
@@ -16,8 +19,8 @@ export async function runWithRetry<T>(
     if (retries <= 0) {
       throw err
     }
-    console.error(err)
-    console.log('Retrying...')
+    log(err)
+    log('Retrying...')
     await wait(retryDelay)
     return runWithRetry(fn, {
       retries: retries - 1

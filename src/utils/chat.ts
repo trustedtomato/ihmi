@@ -4,7 +4,7 @@ import { Either, left, right } from '@sweet-monads/either'
 import { asyncChainLeft } from './async-chain-left.js'
 import { stripIndent } from 'common-tags'
 import { tryCatch } from './try-catch.js'
-import { logWrite } from './log-debug.js'
+import { logLine, logWrite } from './log-debug.js'
 
 export const defaults = {
   model: 'llama3',
@@ -147,7 +147,7 @@ export const chat = async <T = string>(options: {
   } catch (err) {
   } finally {
     // add a newline after the last message
-    console.log()
+    logLine()
   }
 
   log('parsing response')
@@ -166,7 +166,7 @@ export const chat = async <T = string>(options: {
       return left(error)
     }
     log('error received, retrying')
-    console.log('user:', error)
+    logLine('user:', error)
     return await chat({
       ...options,
       messages: [

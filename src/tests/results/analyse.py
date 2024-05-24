@@ -3,6 +3,8 @@ import json
 from collections import defaultdict
 from typing import Any, Dict, Set
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+from adjustText import adjust_text
 import numpy as np
 
 # utilities
@@ -168,6 +170,7 @@ for (model, model_name) in zip(models, model_names):
 
         colors = ['red', 'blue', 'cyan', 'green', 'yellow', '#6f6', 'orange', 'pink', 'black', 'gray']
         alpha=0.3
+        handles = []
         # Plot the data in the order of fastest to slowest
         for algorithm_name in label_order:
             algorithm_data = results_by_algorithm[algorithm_name]
@@ -177,11 +180,14 @@ for (model, model_name) in zip(models, model_names):
             times_taken = [model_data['timeTotal'][i] for i in range(len(model_data['timeTotal']))]
             color_index = colors.pop(0)
             if plot_type == 'spread':
-                plt.scatter(times_taken, accuracies, label=algorithm_name, marker='$\circ$', color=color_index, alpha=alpha)
+                plt.scatter(times_taken, accuracies, marker='$\circ$', color=color_index, alpha=alpha)
                 plt.scatter(times_taken, accuracies_individual, color=color_index, marker='x', alpha=alpha)
             elif plot_type == 'mean':
-                plt.scatter(np.mean(times_taken), np.mean(accuracies), label=algorithm_name, marker='$\circ$', color=color_index)
+                plt.scatter(np.mean(times_taken), np.mean(accuracies), marker='$\circ$', color=color_index)
                 plt.scatter(np.mean(times_taken), np.mean(accuracies_individual), color=color_index, marker='x')
+            
+            # Hack for legend entries
+            handles.append(mlines.Line2D([], [], color=color_index, marker='o', linestyle='None', markersize=8, label=algorithm_name))
 
         # Add title and labels to the axes
         plt.title('Accuracy vs Average Run Time (' + model_name + ')')
@@ -189,7 +195,7 @@ for (model, model_name) in zip(models, model_names):
         plt.ylabel('Accuracy')
 
         # Add a legend
-        plt.legend(title='Labels', fontsize=font_size, title_fontsize=font_size, loc='lower right')
+        plt.legend(title='Labels', handles=handles, fontsize=font_size-2, title_fontsize=font_size-2, loc='lower right')
 
         # Show the plot
         plt.grid(True)

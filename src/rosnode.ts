@@ -106,15 +106,21 @@ subscribeToString('/pickup_request', async (pickupRequest: string) => {
   // Remove the box from the objects list
   objs.splice(placeLocationIndex, 1)
 
-  // Run the LLM
-  const objsToPickup = await eitherToPromise(bestAlgorithm(objs, pickupRequest))
+  try {
+    // Run the LLM
+    const objsToPickup = await eitherToPromise(
+      bestAlgorithm(objs, pickupRequest)
+    )
 
-  // Send the goals to the arm in sequence
-  for (const obj of objsToPickup) {
-    await sendActionGoal(armPickAndPlaceAction, {
-      object_to_pick: obj.worldCoordinates,
-      location_to_place: placeLocation?.worldCoordinates
-    })
+    // Send the goals to the arm in sequence
+    for (const obj of objsToPickup) {
+      await sendActionGoal(armPickAndPlaceAction, {
+        object_to_pick: obj.worldCoordinates,
+        location_to_place: placeLocation.worldCoordinates
+      })
+    }
+  } catch (err) {
+    ros.log.error(err)
   }
 
   ros.log.info('Done')

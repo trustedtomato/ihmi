@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "npx tsx src/tests/index.ts",
-    "analyse": "python src/tests/results/analyse.py"
+    "analyse": "python src/tests/results/analyse.py",
+    "start": "npx tsx src/rosnode.ts"
   },
   "author": "",
   "license": "ISC",

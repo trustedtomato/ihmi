@@ -48,7 +48,7 @@ const armPickAndPlaceAction = nh.actionClientInterface(
 )
 
 const armScanAction = nh.actionClientInterface(
-  '/arm_scanner',
+  '/arm_handling_node',
   'arm_handling_node/ScanArea'
 )
 

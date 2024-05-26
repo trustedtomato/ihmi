@@ -17,6 +17,7 @@ In order to have a good understanding of the codebase, it is recommended to star
 Some of the more interesting files include:
 
 - The test suite runner: [src/tests/index.ts](src/tests/index.ts)
+- The ROS node: [src/rosnode.ts](src/rosnode.ts)
 - One of the simpler algorithms, for example: [src/algorithms/alg-cot-zeroshot.ts](src/algorithms/alg-cot-zeroshot.ts)
 - The utility function called chat, which provides an abstraction over the Ollama API: [src/utils/chat.ts](src/utils/chat.ts)
 - The base definitions for the output grammars: [src/utils/grammars.gbnf](src/utils/grammars.gbnf)

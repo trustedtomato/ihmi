@@ -1,4 +1,4 @@
-# LLM
+# IHMI - LLM
 
 ## Development
 

@@ -41,6 +41,11 @@ export const datasets = [dataset1Src, dataset2Src].map((dataset) => ({
       y: 0,
       width: 1,
       height: 1
+    },
+    worldCoordinates: {
+      x: 0,
+      y: 0,
+      z: 0
     }
   })) satisfies DatasetObject[]
 }))

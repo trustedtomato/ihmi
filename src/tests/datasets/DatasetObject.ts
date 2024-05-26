@@ -5,9 +5,16 @@ export interface BoundingBox {
   height: number
 }
 
+export interface WorldCoordinates {
+  x: number
+  y: number
+  z: number
+}
+
 export interface DatasetObject {
   label: string
   confidence: number
   trackingId: number
   boundingBox: BoundingBox
+  worldCoordinates: WorldCoordinates
 }
